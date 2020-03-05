@@ -1,14 +1,20 @@
-const cool = require('cool-ascii-faces')
 var express = require('express');
 var router = express.Router();
-const path = require('path')
-const PORT = process.env.PORT || 5000
-
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });
 });
-
+var pg = require('pg');
+router.get('/index', function (request, response) {
+  pg.connect(process.env.DATABASE_URL, function(err, client, done) {
+    client.query('SELECT * FROM test_table', function(err, result) {
+      done();
+      if (err)
+      { console.error(err); response.send("Error " + err); }
+      else
+      { response.render('/db', {results: result.rows} ); }
+    });
+  });
+});
 module.exports = router;
-
